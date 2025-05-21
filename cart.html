@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart - ArtStokes</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cart-container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding: 15px 0;
+    }
+
+    .cart-item img {
+      width: 80px;
+      border-radius: 8px;
+    }
+
+    .cart-item-details {
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cart-item-controls button {
+      background: #d63384;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .total {
+      text-align: right;
+      font-size: 1.2rem;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .cart-summary {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#total-price {
+  font-weight: bold;
+  color: #ff3399;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.checkout-btn {
+  padding: 10px 20px;
+  background-color: #ff66b2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #e0559c;
+}
+
+.payment-form {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #fff0f5;
+  border: 1px solid #ffb6c1;
+  border-radius: 10px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.payment-form input {
+  width: 90%;
+  padding: 8px;
+  margin: 10px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+    
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-area">
+      <img src="logo.png" alt="ArtStokes Logo" class="logo-img" />
+      <span class="site-name">ArtStokes</span>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="categories.html">Categories</a>
+      <a href="login.html">Login</a>
+      <a href="cart.html" class="cart-icon">🛒 <span class="cart-count"></span></a>
+    </nav>
+  </header>
+
+  <div class="cart-container">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <div class="total" id="cart-total">Total: $0.00</div>
+  </div>
+
+  <div class="cart-summary">
+    <button class="checkout-btn" onclick="showPaymentForm()">Proceed to Checkout</button>
+  </div>
+  <!-- Hidden Payment Form -->
+<div class="payment-form" id="payment-form" style="display: none;">
+  <h3>Enter Payment Details</h3>
+  <form onsubmit="return processPayment(event)">
+    <input type="text" placeholder="Name on Card" required /><br />
+    <input type="text" placeholder="Card Number" required /><br />
+    <input type="text" placeholder="MM/YY" required /><br />
+    <input type="text" placeholder="CVV" required /><br />
+    <button type="submit" class="checkout-btn">Pay Now</button>
+  </form>
+</div>
+
+
+  <script>
+    function loadCart() {
+      return JSON.parse(localStorage.getItem("cart")) || [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    function updateCartCount() {
+      const cart = loadCart();
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      document.querySelector(".cart-count").textContent = count;
+    }
+
+    function renderCart() {
+      const cart = loadCart();
+      const container = document.getElementById("cart-items");
+      const totalDisplay = document.getElementById("cart-total");
+      container.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        total += item.price * item.qty;
+
+        const div = document.createElement("div");
+        div.className = "cart-item";
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" />
+          <div class="cart-item-details">
+            <h4>${item.name}</h4>
+            <p>$${item.price.toFixed(2)}</p>
+          </div>
+          <div class="cart-item-controls">
+            <button onclick="changeQty(${index}, -1)">-</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty(${index}, 1)">+</button>
+            <button onclick="removeItem(${index})">Remove</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      totalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+      updateCartCount();
+    }
+
+    function changeQty(index, delta) {
+      const cart = loadCart();
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    }
+
+    function removeItem(index) {
+      const cart = loadCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      renderCart();
+    }
+
+    // Initial call
+    renderCart();
+    document.querySelector(".checkout-btn").addEventListener("click", () => {
+  alert("Thank you! Proceeding to checkout...");
+  // You can redirect to a real checkout page here
+  // window.location.href = "checkout.html";
+});
+
+ function showPaymentForm() {
+    document.getElementById('payment-form').style.display = 'block';
+  }
+
+  function processPayment(event) {
+    event.preventDefault();
+    alert("Payment successful! Thank you for your purchase.");
+    localStorage.removeItem("cart"); // Clear the cart
+    window.location.href = "index.html"; // Redirect to homepage
+  }
+  </script>
+
+</body>
+</html>
+
+
+
