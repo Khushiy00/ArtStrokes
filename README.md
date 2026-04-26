@@ -3,7 +3,7 @@
 ArtStrokes is a visually engaging e-commerce web platform designed for art enthusiasts to explore, discover, and purchase unique artworks. The website provides a seamless browsing experience with various art categories and a dedicated shopping interface.
 
 ## 🚀 Features
-
+### 🔗 [View Live Website](https://khushiy00.github.io/ArtStrokes/)
 - **Home Page:** A welcoming landing page showcasing the essence of ArtStrokes.
 - **Product Categories:** Organized sections to browse different styles and types of art.
 - **Art Shop:** A dedicated shopping page where users can view available pieces.
